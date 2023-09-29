@@ -30,6 +30,27 @@ def initRandCities(cityCount):
         cities.append((city_name, x, y))
     return cities
 
+# Calculate Distance Between Two Points
+def calculateTwoPointDistance(point1, point2):
+    return ((point1[0]-point2[0])**2+(point1[1]-point2[1])**2)**0.5
+
+# Calculating Total Distance or Fitness
+def fitnessEvalualtionCalcualtion(cities):
+    total_distance = 0.0
+    for i in range(len(cities) - 1):
+        current_city = cities[1]
+        next_city = cities[i + 1]
+        total_distance += calculateTwoPointDistance(current_city, next_city)
+    return total_distance
+
+# Calculating Total Distance or Fitness Of The Whole List
+def wholeListFitnessEvaluation():
+    fitness_list = []
+    for i in range(cityCount):
+        fitness_list[i] = fitnessEvalualtionCalcualtion(cities[i])
+        
+    return fitness_list
+
 def queryUser(query, typeDesired, defaultValue = False):
     """Queries the user, for a specific type, can accept default value"""
     while(1):
