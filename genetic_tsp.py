@@ -1,97 +1,136 @@
-from typing import Optional
 import random
+import aux
+from matplotlib import pyplot as plt
 
 City = tuple[str, float, float]
-Point = tuple[float, float]
+Route = list[City]
+Population = list[Route]
 
-def generate_city_name(n: int) -> str:
-    """Returns string name based on an int > 0."""
-    name = "A" if n == 0 else ""
+# Step 1: Generate a random population of `n` individuals.
+def generate_random_population(size: int, city_count: int) -> Population:
+    population: Population = []
 
-    while n > 0:
-        name += chr(65 + (n % 26))
-        n = int(n / 26)
+    for _ in range(size):
+        cities = aux.generate_random_cities(city_count)
 
-    return name
+        aux.plot_cities(cities)
+        random.shuffle(cities)
+        population.append(cities)
 
-def print_cities(cities: list[City]) -> None:
-    print("{:6}\t{:>6}\t{:>6}".format("City", "X", "Y"))
+    return population
 
-    for city in cities:
-        print("{:6}\t{:>6.2f}\t{:>6.2f}".format(city[0],city[1],city[2]))
-
-def init_random_cities(count: int) -> list[City]:
-    """Returns initialized list of random cities."""
-    cities: list[City] = []
-    max_x_axis = 200
-    max_y_axis = 200
-
-    for i in range(count):
-        city_name = generate_city_name(i)
-        x = random.uniform(0, max_x_axis)
-        y = random.uniform(0, max_y_axis)
-        cities.append((city_name, x, y))
-
-    return cities
-
-def calculate_distance(point1: Point, point2: Point) -> float:
-    return ((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2) ** 0.5
-
-def fitness(cities: list[City]) -> float:
+# Step 2: Calculate the fitness of each individual in the population.
+def calculate_fitness(route: Route) -> float:
     total_distance = 0.0
     previous_city = None
 
-    for city in cities:
+    for city in route:
         if previous_city is not None:
-            total_distance += calculate_distance((previous_city[1], previous_city[2]), (city[1], city[2]))
+            total_distance += aux.calculate_distance((previous_city[1], previous_city[2]), (city[1], city[2]))
 
         previous_city = city
 
     return total_distance
 
-def ask_yes_no_question(question: str, default: bool = False) -> bool:
-    """Asks a yes or no question and returns a boolean"""
-    while True:
-        print(question + " (y/n)", end = " ")
-        userInput = input()
+# Step 3: Select the best-fit `k` individuals for reproduction.
+def select_parents(population: Population, k: int) -> Population:
+    # Sort the population by fitness (ascending, prioritizing shortest distance first).
+    sorted_population = sorted(population, key=calculate_fitness, reverse=False)
 
-        if (len(userInput) == 0 and default):
-            return default
-        elif userInput.lower() == "y":
-            return True
-        elif userInput.lower() == "n":
-            return False
+    return sorted_population[:k]
 
-def query_user(query: str, default: Optional[str] = None) -> str:
-    """Queries the user for input and returns their response"""
-    print(query, end = " ")
+# Step 4: Create `n` new individuals by combining the best `k` individuals.
+def crossover(parent_a: Route, parent_b: Route) -> Route:
+    idx1, idx2 = sorted(random.sample(range(len(parent_a)), 2))
+    common = parent_a[idx1:idx2]
+    child = [city for city in parent_b if city not in common]
 
-    user_input = input()
-    user_did_not_input_anything = len(user_input) == 0
+    child[idx1:idx1] = common
 
-    if default is not None and user_did_not_input_anything:
-        return default
-    elif not user_did_not_input_anything:
-        return user_input
+    return child
 
-    return query_user(query, default)
+# Step 5: Mutate the new individuals.
+def mutate(route: Route, mutation_rate: float) -> Route:
+    for i in range(len(route)):
+        if random.random() < mutation_rate:
+            j = random.randint(0, len(route) - 1)
+            route[i], route[j] = route[j], route[i]
+
+    return route
+
+# Step 6: Main loop.
+def run(population: Population, k: int, iterations: int, mutation_rate: float) -> Population:
+    evolved_population = population[:]
+
+    for _ in range(iterations):
+        parents = select_parents(evolved_population, k)
+        new_population: Population = []
+
+        while len(new_population) < population_size:
+            parent_a, parent_b = random.sample(parents, 2)
+            child = crossover(parent_a, parent_b)
+            mutated_child = mutate(child, mutation_rate)
+
+            new_population.append(mutated_child)
+
+        evolved_population = new_population
+
+    return evolved_population
+
+def initialize_and_plot(
+    iterations: int,
+    population_size: int,
+    k: int,
+    mutation_rate: float,
+    city_count: int
+) -> None:
+    PLOT_STEP_DELAY = 0.01
+
+    best_route = None
+    best_distance = float("inf")
+
+    # Prepare the graph. Reuse a single figure for all plots.
+    plt.figure()
+
+    population = generate_random_population(population_size, city_count)
+
+    for i in range(iterations):
+        # Get the best individual in the current population
+        population = run(population, k, 1, mutation_rate)
+        best_current_route = select_parents(population, 1)[0]
+        best_current_distance = calculate_fitness(best_current_route)
+
+        if best_current_distance < best_distance:
+            best_distance = best_current_distance
+            best_route = best_current_route
+
+        # Plot the current best route.
+        plt.title(f"Iteration {i+1}, Distance: {best_current_distance:.2f}, Best distance: {best_distance:.2f}")
+        plt.xlabel("X")
+        plt.ylabel("Y")
+        aux.plot_route(best_current_route)
+        plt.show(block=False)
+
+        # Pause for brief moment to allow update to be seen.
+        plt.pause(PLOT_STEP_DELAY)
+
+        # Clear the plot for the next iteration.
+        plt.clf()
+
+    assert best_route is not None, "a best route should always be found"
+    print("Genetic Algorithm finished.")
+    print(f"Best distance: {best_distance:.2f}")
+    print(f"Best route: {best_route}")
 
 if __name__ == "__main__":
-    print("Welcome to a Genetic Algorithm solver for  the TSP")
+    print("Welcome to a Genetic Algorithm solver for  the TSP!")
 
-    DEFAULT_CITY_COUNT: int = 26
-    cityCount = int(query_user("How many cities do you want?", str(DEFAULT_CITY_COUNT)))
-    random_cities = init_random_cities(cityCount)
+    iterations = int(aux.query_user("How many iterations?", "1000"))
+    city_count = int(aux.query_user("How many cities?", "20"))
+    mutation_rate = float(aux.query_user("What mutation rate (float)?", "0.1"))
+    population_size = int(aux.query_user("What population size?", "50"))
+    k = int(aux.query_user("What k value?", "3"))
+    seed = aux.query_user("What random seed?", "123456")
 
-    print("Cities generated!")
-    print_cities(random_cities)
-
-    mutation_rate = float(query_user("What mutation rate do you want (float)?"))
-    child_proportion = float(query_user("What proportion of new children do you want (float)?"))
-    stop_on_stagnation = ask_yes_no_question("Stop the algorithm on stagnation?")
-    when_is_stagnation = 0
-
-    if stop_on_stagnation:
-        when_is_stagnation = query_user("How many iterations before stagnation is considered? (int)", "int")
-
-    print("TEST: ", mutation_rate, child_proportion, stop_on_stagnation, when_is_stagnation)
+    random.seed(seed)
+    initialize_and_plot(iterations, population_size, k, mutation_rate, city_count)
