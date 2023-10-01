@@ -8,6 +8,8 @@ async function generate()
     const kvalue = document.getElementById("k-value").value;
     const seed = document.getElementById("seed").value;
 
+    document.getElementById("graph-img").alt = "Generating..."
+
     const response = await fetch("/generate", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
