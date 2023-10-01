@@ -1,22 +1,36 @@
-from flask import Flask
 import genetic_tsp
 import aux
+import flask
 
-from flask import Flask
-
-app = Flask(__name__)
+app = flask.Flask(__name__, static_folder="assets")
 
 @app.route("/")
-def test():
-    iterations = int(aux.query_user("How many iterations?", "1000"))
-    city_count = int(aux.query_user("How many cities?", "20"))
-    mutation_rate = float(aux.query_user("What mutation rate (float)?", "0.1"))
-    population_size = int(aux.query_user("What population size?", "50"))
-    k = int(aux.query_user("What k value?", "3"))
-    seed = aux.query_user("What random seed?", "123456")
+def index():
+    return flask.render_template("index.html")
 
-    #random.seed(seed)
-    return genetic_tsp.initialize_and_plot(iterations, population_size, k, mutation_rate, city_count)
+@app.route("/generate", methods=["POST"])
+def generate():
+    print("Generating...")
+
+    if not flask.request.is_json:
+        #do something here
+        pass
+
+    # absorb data
+    data = flask.request.get_json()
+    iterations = int(data["iter"])
+    city_count = int(data["citycount"])
+    mutation_rate = float(data["mutationrate"])
+    population_size = int(data["populationsize"])
+    k = int(data["kvalue"])
+    seed = data["seed"]
+
+    return flask.jsonify({
+        "graph": genetic_tsp.initialize_and_plot(iterations, population_size, k, mutation_rate, city_count),
+        "error": ""
+    })
+
+
 
 # Application entry point.
 if __name__ == "__main__":

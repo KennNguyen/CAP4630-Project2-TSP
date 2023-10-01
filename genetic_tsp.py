@@ -128,9 +128,9 @@ def initialize_and_plot(
     # create a buffer and store the fig in it
     buf = BytesIO()
     fig.savefig(buf, format="png")
-    # convert buffer then return formated html string
+    # convert buffer then return formated png string
     data = base64.b64encode(buf.getbuffer()).decode("ascii")
-    return f"<img src='data:image/png;base64,{data}'/>"
+    return f"data:image/png;base64,{data}"
 
 if __name__ == "__main__":
     print("Welcome to a Genetic Algorithm solver for  the TSP!")
