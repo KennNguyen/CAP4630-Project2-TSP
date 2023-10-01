@@ -1,14 +1,14 @@
-# Genetic algorithm to solve the travelling salesman problem
+# Genetic algorithm to solve the travelling salesman problem -- Web Extra Credit
 
-This is a genetic algorithm to solve the travelling salesman problem. It is written in Python 3 and uses the `matplotlib` library to plot the results.
+This is a genetic algorithm to solve the travelling salesman problem. It is written in Python 3 and uses the `matplotlib` library to plot the results on a `flask` webserver.
 
 ## Install
 
 1. Download or clone the respository.
 2. Install Python3.
 3. Install python module `matplotlib` *
-4. If your system doesn't already have an interactable backend for python: Install python module `PyQt5` *
-5. Run `genetic_tsp.py`
+4. Install `flask` *
+5. Run `genetic_tsp.py` with the `flask` webserver
 
 *When installing python modules on a system with a dedicated package manager (ie most Linux distros), use a python virtual enviroment before installing a python module.
 
