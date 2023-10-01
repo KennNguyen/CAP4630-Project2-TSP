@@ -1,9 +1,14 @@
 from typing import Optional
-import genetic_tsp
 import random
-from matplotlib import pyplot as plt
+##from matplotlib import pyplot as plt
+from matplotlib.figure import Figure
 
+
+City = tuple[str, float, float]
+Route = list[City]
+Population = list[Route]
 Point = tuple[float, float]
+
 
 def calculate_distance(point1: Point, point2: Point) -> float:
     return ((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2) ** 0.5
@@ -47,15 +52,15 @@ def hash_city_name(n: int) -> str:
 
     return name
 
-def print_cities(cities: list[genetic_tsp.City]) -> None:
+def print_cities(cities: list[City]) -> None:
     print("{:6}\t{:>6}\t{:>6}".format("City", "X", "Y"))
 
     for city in cities:
         print("{:6}\t{:>6.2f}\t{:>6.2f}".format(city[0],city[1],city[2]))
 
-def generate_random_cities(count: int) -> list[genetic_tsp.City]:
+def generate_random_cities(count: int) -> list[City]:
     """Returns initialized list of random cities."""
-    cities: list[genetic_tsp.City] = []
+    cities: list[City] = []
     max_x_axis = 200
     max_y_axis = 200
 
@@ -67,14 +72,14 @@ def generate_random_cities(count: int) -> list[genetic_tsp.City]:
 
     return cities
 
-def plot_route(route: genetic_tsp.Route) -> None:
+def plot_route(route: Route, plt) -> None:
     x = [point[1] for point in route]
     y = [point[2] for point in route]
 
     plt.scatter(x, y, color="red", label="Cities")
     plt.plot(x + [x[0]], y + [y[0]], color="blue", linestyle="dashed", linewidth=1)
 
-def plot_cities(cities: list[genetic_tsp.City]) -> None:
+def plot_cities(cities: list[City], plt) -> None:
     x = [city[1] for city in cities]
     y = [city[2] for city in cities]
 

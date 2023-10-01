@@ -1,26 +1,25 @@
 import random
 import aux
-from matplotlib import pyplot as plt
-
-City = tuple[str, float, float]
-Route = list[City]
-Population = list[Route]
+##from matplotlib import pyplot as plt
+from matplotlib.figure import Figure
+import base64
+from io import BytesIO
 
 # Step 1: Generate a random population of `n` individuals.
-def generate_random_population(size: int, city_count: int) -> Population:
-    population: Population = []
+def generate_random_population(size: int, city_count: int, plt) -> aux.Population:
+    population: aux.Population = []
 
     for _ in range(size):
         cities = aux.generate_random_cities(city_count)
 
-        aux.plot_cities(cities)
+        aux.plot_cities(cities, plt)
         random.shuffle(cities)
         population.append(cities)
 
     return population
 
 # Step 2: Calculate the fitness of each individual in the population.
-def calculate_fitness(route: Route) -> float:
+def calculate_fitness(route: aux.Route) -> float:
     total_distance = 0.0
     previous_city = None
 
@@ -33,14 +32,14 @@ def calculate_fitness(route: Route) -> float:
     return total_distance
 
 # Step 3: Select the best-fit `k` individuals for reproduction.
-def select_parents(population: Population, k: int) -> Population:
+def select_parents(population: aux.Population, k: int) -> aux.Population:
     # Sort the population by fitness (ascending, prioritizing shortest distance first).
     sorted_population = sorted(population, key=calculate_fitness, reverse=False)
 
     return sorted_population[:k]
 
 # Step 4: Create `n` new individuals by combining the best `k` individuals.
-def crossover(parent_a: Route, parent_b: Route) -> Route:
+def crossover(parent_a: aux.Route, parent_b: aux.Route) -> aux.Route:
     idx1, idx2 = sorted(random.sample(range(len(parent_a)), 2))
     common = parent_a[idx1:idx2]
     child = [city for city in parent_b if city not in common]
@@ -50,7 +49,7 @@ def crossover(parent_a: Route, parent_b: Route) -> Route:
     return child
 
 # Step 5: Mutate the new individuals.
-def mutate(route: Route, mutation_rate: float) -> Route:
+def mutate(route: aux.Route, mutation_rate: float) -> aux.Route:
     for i in range(len(route)):
         if random.random() < mutation_rate:
             j = random.randint(0, len(route) - 1)
@@ -59,12 +58,12 @@ def mutate(route: Route, mutation_rate: float) -> Route:
     return route
 
 # Step 6: Main loop.
-def run(population: Population, k: int, iterations: int, mutation_rate: float) -> Population:
+def run(population: aux.Population, population_size: int,k: int, iterations: int, mutation_rate: float) -> aux.Population:
     evolved_population = population[:]
 
     for _ in range(iterations):
         parents = select_parents(evolved_population, k)
-        new_population: Population = []
+        new_population: aux.Population = []
 
         while len(new_population) < population_size:
             parent_a, parent_b = random.sample(parents, 2)
@@ -83,20 +82,21 @@ def initialize_and_plot(
     k: int,
     mutation_rate: float,
     city_count: int
-) -> None:
+):
     PLOT_STEP_DELAY = 0.01
 
     best_route = None
     best_distance = float("inf")
 
     # Prepare the graph. Reuse a single figure for all plots.
-    plt.figure()
+    fig = Figure()
+    plt = fig.subplots()
 
-    population = generate_random_population(population_size, city_count)
+    population = generate_random_population(population_size, city_count, plt)
 
     for i in range(iterations):
         # Get the best individual in the current population
-        population = run(population, k, 1, mutation_rate)
+        population = run(population, population_size, k, 1, mutation_rate)
         best_current_route = select_parents(population, 1)[0]
         best_current_distance = calculate_fitness(best_current_route)
 
@@ -104,23 +104,33 @@ def initialize_and_plot(
             best_distance = best_current_distance
             best_route = best_current_route
 
+        # Clear the plot for the next iteration.
+        plt.cla()
+
         # Plot the current best route.
-        plt.title(f"Iteration {i+1}, Distance: {best_current_distance:.2f}, Best distance: {best_distance:.2f}")
-        plt.xlabel("X")
-        plt.ylabel("Y")
-        aux.plot_route(best_current_route)
-        plt.show(block=False)
+        plt.set_title(f"Iteration {i+1}, Distance: {best_current_distance:.2f}, Best distance: {best_distance:.2f}")
+        plt.set_xlabel("X")
+        plt.set_ylabel("Y")
+        aux.plot_route(best_current_route, plt)
+        #plt.show(block=False)
 
         # Pause for brief moment to allow update to be seen.
-        plt.pause(PLOT_STEP_DELAY)
+        #plt.pause(PLOT_STEP_DELAY)
 
-        # Clear the plot for the next iteration.
-        plt.clf()
+
 
     assert best_route is not None, "a best route should always be found"
     print("Genetic Algorithm finished.")
     print(f"Best distance: {best_distance:.2f}")
     print(f"Best route: {best_route}")
+
+    # we need something to show on webpage, so
+    # create a buffer and store the fig in it
+    buf = BytesIO()
+    fig.savefig(buf, format="png")
+    # convert buffer then return formated html string
+    data = base64.b64encode(buf.getbuffer()).decode("ascii")
+    return f"<img src='data:image/png;base64,{data}'/>"
 
 if __name__ == "__main__":
     print("Welcome to a Genetic Algorithm solver for  the TSP!")
