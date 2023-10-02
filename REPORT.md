@@ -30,5 +30,9 @@ The repopulation of the next generation is done by combining the best-fit parent
 
 The stopping condition we used was a limited number of iterations as defined by the user.
  
+## Screenshots and .gifs
+!["Original TSP solution"](https://raw.githubusercontent.com/KennNguyen/CAP4630-Project2-TSP/tree/main/images/tsp.gif)
+
+!["Web TSP solution"](https://raw.githubusercontent.com/KennNguyen/CAP4630-Project2-TSP/tree/main/images/wstsp.gif)
 
  
