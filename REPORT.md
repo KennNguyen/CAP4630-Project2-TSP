@@ -29,6 +29,8 @@ The mutation method we used is swap mutation. Two cities are randomly swapped wi
 The repopulation of the next generation is done by combining the best-fit parents with the mutated offspring. 
 
 The stopping condition we used was a limited number of iterations as defined by the user.
+
+Simple experiments that we ran on out program was alteration of values to see the change in final values such as the alteration of iterations to see if the computer can come up with a better route if given many iterations.
  
 ## Screenshots and .gifs
 !["Original TSP solution"](https://raw.githubusercontent.com/KennNguyen/CAP4630-Project2-TSP/tree/main/images/tsp.gif)
