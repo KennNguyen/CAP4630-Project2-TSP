@@ -1,4 +1,4 @@
-Kenneth Nguyen, Yurixander Silva, Zee Fisher  
+Kenneth Nguyen(Reporter), Yurixander Silva(Architect), Zee Fisher(Developer)  
 Professor Marques   
 CAP 4630   
 September 30, 2023  
