@@ -35,4 +35,3 @@ The pipeline is as follows:
 
 * Each individual is represented as a `Route`, which is a list of `City` tuples.
 * The fitness of each individual is calculated as the total distance of the route.
-* TODO
