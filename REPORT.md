@@ -8,6 +8,9 @@ September 30, 2023
 ## Work Report
 At the beginning of the project, Kenneth done basic research on the what genetic algorithm is and how the implementation would be done for the Traveling Salesman Problem. Zee coded the basic program in which it gathers parameter information from the user and prints them out as well as the web side of the solution. Kenneth coded several function such as cities generation, distance calculation, and selection function. Yurixander coded the rest of the remaing functions of the genetic algorithm along with research and decisions on specificity of the functions such as selection method due to better selection of better fit parents than fitness proportionate selection.  
 
+## Possible Improvements
+There are many possible improvements to the code. To begin with we could have improved the crossover strategy using an advance crossover method such as order or cycle crossover. Moreover, the mutation rate can be improved as well with a more dynamic or adaptive mutation rate to where it has a higher mutation rate in the beginning, but slows down in later generations. In addition, we could have implemented heuristics seach algorithms to work along side the genetic algorithm such as opt search to refine solution quality. As well as that, process could be parallelized for exploration of multiple regions simultaneously for faster process or work alongside different optimization process such as simulated annealing, particle swarm optimization, or ant colony optimization. Finally, we could improve on stopping conditions with stagnation, fixed time limits, or with resource constraints.
+
 ## Answers to Questions
 Data regarding cities were encapsulated into a tuple in which it holds information on its identification, x-coordinate, and y-coordinate within the plane dimension of two hundred by two hundred. Data regarding distances are encapsulated into a list. 
 
