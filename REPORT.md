@@ -33,6 +33,8 @@ The stopping condition we used was a limited number of iterations as defined by 
 Simple experiments that we ran on out program was alteration of values to see the change in final values such as the alteration of iterations to see if the computer can come up with a better route if given many iterations.
  
 ## Screenshots and .gifs
+!["Initial generation"](https://raw.githubusercontent.com/KennNguyen/CAP4630-Project2-TSP/main/images/Initial%20Generation.png)
+
 !["Original TSP solution"](https://github.com/KennNguyen/CAP4630-Project2-TSP/blob/main/images/tsp.gif?raw=true)
 
 !["Web TSP solution"](https://github.com/KennNguyen/CAP4630-Project2-TSP/blob/main/images/wstsp.png?raw=true)
